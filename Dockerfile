@@ -20,8 +20,8 @@ RUN apt-get update \
          libgmp-dev \
          libmagickwand-dev \
          openssh-server \
-         mysql-client \   
-         git \              
+         mysql-client \
+         git \
     && chmod 755 /bin/init_container.sh \
     && echo "root:Docker!" | chpasswd \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
@@ -29,6 +29,7 @@ RUN apt-get update \
     && ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h \
     && rm -rf /var/lib/apt/lists/* \
     && pecl install imagick-beta \
+    && yes '' | pecl install -f redis \
     && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
     && docker-php-ext-install gd \
          json \
@@ -47,9 +48,8 @@ RUN apt-get update \
          mbstring \
          pcntl \
          ftp \
-    && docker-php-ext-enable imagick \
-    && yes '' | pecl install -f redis 
- 
+    && docker-php-ext-enable imagick
+
 
 
 RUN   \
@@ -66,7 +66,7 @@ RUN   \
    && rm -rf /var/log/apache2 \
    && mkdir -p /home/LogFiles \
    && ln -s /home/site/wwwroot /var/www/html \
-   && ln -s /home/LogFiles /var/log/apache2 
+   && ln -s /home/LogFiles /var/log/apache2
 
 
 RUN { \
@@ -116,16 +116,13 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
     && rm /tmp/composer-setup.php \
     && ln -sf /composer/bin/composer /usr/local/bin/composer
 
+#Create docroot
+RUN mkdir -p /home/site/wwwroot/docroot
 
-#Drush
-#Create docroot and install drush 
-RUN mkdir -p /home/site/wwwroot/docroot 
-RUN php -r "readfile('http://files.drush.org/drush.phar');" > /home/site/wwwroot/docroot/drush 
-
-ENV PATH ${PATH}:/home/site/wwwroot/docroot
+#Install drush
+RUN php -r "readfile('http://files.drush.org/drush.phar');" > /home/site/wwwroot/drush && chmod +x /home/site/wwwroot/drush
 
 WORKDIR /var/www/html
-
 RUN drush @none dl registry_rebuild-7.x
 
 ENTRYPOINT ["/bin/init_container.sh"]
