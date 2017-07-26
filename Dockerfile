@@ -97,12 +97,11 @@ ENV PATH ${PATH}:/home/site/wwwroot
 ENV PATH ${PATH}:/usr/local/php/bin/
 
 #Composer
-ENV PATH ${PATH}:/composer/vendor/bin
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /composer
 ENV COMPOSER_VERSION 1.4.2
 
-RUN php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --version=${COMPOSER_VERSION} && rm -rf /tmp/composer-setup.php
+RUN cd /usr/local/php/bin && curl -s https://getcomposer.org/installer | php
 
 #Drush
 #Create docroot and install drush 
