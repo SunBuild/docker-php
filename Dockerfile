@@ -122,7 +122,7 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
 RUN mkdir -p /home/site/wwwroot/docroot 
 ENV PATH ${PATH}:/home/site/wwwroot/docroot
 RUN php -r "readfile('http://files.drush.org/drush.phar');" > /home/site/wwwroot/docroot/drush \
- && drush @none dl registry_rebuild-7.x
+    && drush @none dl registry_rebuild-7.x
 
 
 WORKDIR /var/www/html
