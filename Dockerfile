@@ -47,7 +47,10 @@ RUN apt-get update \
          mbstring \
          pcntl \
          ftp \
-    && docker-php-ext-enable imagick
+    && docker-php-ext-enable imagick \
+    && yes '' | pecl install -f redis 
+ 
+
 
 RUN   \
    rm -f /var/log/apache2/* \
@@ -117,7 +120,10 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
 #Drush
 #Create docroot and install drush 
 RUN mkdir -p /home/site/wwwroot/docroot 
-RUN php -r "readfile('http://files.drush.org/drush.phar');" > /home/site/wwwroot/docroot/drush
+ENV PATH ${PATH}:/home/site/wwwroot/docroot
+RUN php -r "readfile('http://files.drush.org/drush.phar');" > /home/site/wwwroot/docroot/drush \
+ && drush @none dl registry_rebuild-7.x
+
 
 WORKDIR /var/www/html
 
