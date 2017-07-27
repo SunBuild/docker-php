@@ -123,10 +123,10 @@ RUN php -r "readfile('http://files.drush.org/drush.phar');" > /home/site/wwwroot
 
 ENV PATH ${PATH}:/home/site/wwwroot/docroot
 
-echo $PATH
+RUN php /home/site/wwwroot/docroot/drush @none dl registry_rebuild-7.x
 
 WORKDIR /var/www/html
 
-#RUN php drush @none dl registry_rebuild-7.x
+
 
 ENTRYPOINT ["/bin/init_container.sh"]
