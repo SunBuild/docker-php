@@ -1,4 +1,16 @@
 #!/bin/bash
+log(){
+	while read line ; do
+		echo "`date '+%D %T'` $line"
+	done
+}
+
+set -e
+logfile=/home/LogFiles/init_container.log
+test ! -f $logfile && mkdir -p /home/LogFiles && touch $logfile
+exec > >(log | tee -ai $logfile)
+exec 2>&1
+
 service ssh start
 sed -i "s/error.log/error_$WEBSITE_ROLE_INSTANCE_ID.log/g" /etc/apache2/apache2.conf 
 sed -i "s/access.log/access_$WEBSITE_ROLE_INSTANCE_ID.log/g" /etc/apache2/apache2.conf
