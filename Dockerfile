@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.0-apache
 MAINTAINER Azure App Services Container Images <appsvc-images@microsoft.com>
 
 RUN a2enmod rewrite expires include
