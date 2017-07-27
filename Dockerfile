@@ -20,8 +20,8 @@ RUN apt-get update \
          libgmp-dev \
          libmagickwand-dev \
          openssh-server \
-         mysql-client \   
-         git \              
+         mysql-client \
+         git \
     && chmod 755 /bin/init_container.sh \
     && echo "root:Docker!" | chpasswd \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
@@ -29,6 +29,7 @@ RUN apt-get update \
     && ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h \
     && rm -rf /var/lib/apt/lists/* \
     && pecl install imagick-beta \
+    && yes '' | pecl install -f redis \
     && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
     && docker-php-ext-install gd \
          json \
@@ -47,9 +48,8 @@ RUN apt-get update \
          mbstring \
          pcntl \
          ftp \
-    && docker-php-ext-enable imagick \
-    && yes '' | pecl install -f redis 
- 
+    && docker-php-ext-enable imagick
+
 
 
 RUN   \
@@ -66,7 +66,7 @@ RUN   \
    && rm -rf /var/log/apache2 \
    && mkdir -p /home/LogFiles \
    && ln -s /home/site/wwwroot /var/www/html \
-   && ln -s /home/LogFiles /var/log/apache2 
+   && ln -s /home/LogFiles /var/log/apache2
 
 
 RUN { \
@@ -110,18 +110,14 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
     && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) === getenv('COMPOSER_SETUP_SHA')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('/tmp/composer-setup.php'); echo PHP_EOL; exit(1); } echo PHP_EOL;" \
     && mkdir -p /composer/bin \
     && php /tmp/composer-setup.php --install-dir=/usr/local/bin/ --filename=composer --version=${COMPOSER_VERSION} \
-    && rm /tmp/composer-setup.php 
+    && rm /tmp/composer-setup.php
 
 #Drush
-#Create docroot and install drush 
+RUN php -r "readfile('http://files.drush.org/drush.phar');" > /usr/local/bin/drush \
+    && chmod +x /usr/local/bin/drush
+RUN drush @none dl registry_rebuild-7.x
 
-RUN php -r "readfile('http://files.drush.org/drush.phar');" > drush \
-    && mv drush /usr/local/bin
-
-RUN echo $PATH
-#RUN php drush --version  
-#RUN php composer 
-
+RUN mkdir -p /home/site/wwwroot/docroot
 WORKDIR /var/www/html
 
 ENTRYPOINT ["/bin/init_container.sh"]
