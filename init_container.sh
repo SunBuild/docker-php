@@ -11,18 +11,18 @@ test ! -f $logfile && mkdir -p /home/LogFiles && touch $logfile
 exec > >(log | tee -ai $logfile)
 exec 2>&1
 
-service ssh start
-sed -i "s/error.log/error_$WEBSITE_ROLE_INSTANCE_ID.log/g" /etc/apache2/apache2.conf
-sed -i "s/access.log/access_$WEBSITE_ROLE_INSTANCE_ID.log/g" /etc/apache2/apache2.conf
-sed -i "s/{PORT}/$PORT/g" /etc/apache2/apache2.conf
+set -x
 
 if [ ! -d "/home/site/wwwroot/docroot" ]; then
   mkdir -p /home/site/wwwroot/docroot
 fi
 drush @none dl registry_rebuild-7.x
 
-touch /var/log/apache2/access_$WEBSITE_ROLE_INSTANCE_ID.log
+if [ ! -z "$PORT" ];then
+	sed -i -e "s/listen   80/listen   ${PORT}/" /etc/nginx/sites-enabled/default.conf
+fi
 
-echo "$(date) Container started" >> /var/log/apache2/access_$WEBSITE_ROLE_INSTANCE_ID.log
+ssh-keygen -A
+/usr/sbin/sshd
 
-/usr/sbin/apache2ctl -D FOREGROUND
+/start.sh

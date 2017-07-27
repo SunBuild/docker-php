@@ -1,28 +1,27 @@
-FROM php:7.1-apache
-MAINTAINER Azure App Services Container Images <appsvc-images@microsoft.com>
-
-RUN a2enmod rewrite expires include
+FROM richarvey/nginx-php-fpm:1.2.2
+MAINTAINER Women's Tennis Association <admin@wtanetworks.com>
 
 # install the PHP extensions we need
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-         libpng12-dev \
-         libjpeg-dev \
-         libpq-dev \
+RUN apk upgrade --update && \
+    apk add \
+         autoconf \
+         g++ \
+         make \
+         libpng-dev \
+         libjpeg-turbo-dev \
+         postgresql-dev \
          libmcrypt-dev \
-         libldap2-dev \
-         libldb-dev \
-         libicu-dev \
-         libgmp-dev \
-         libmagickwand-dev \
-         openssh-server \
+         openldap-dev \
+         ldb-dev \
+         icu-dev \
+         gmp-dev \
+         imagemagick-dev \
+         pcre-dev \
+         libtool \
+         openssh \
          mysql-client \
          git \
     && echo "root:Docker!" | chpasswd \
-    && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
-    && ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h \
-    && rm -rf /var/lib/apt/lists/* \
     && pecl install imagick-beta \
     && yes '' | pecl install -f redis \
     && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
@@ -46,14 +45,11 @@ RUN apt-get update \
     && docker-php-ext-enable imagick redis
 
 
-COPY apache2.conf /etc/apache2/
 COPY init_container.sh /bin/
 COPY hostingstart.html /home/site/wwwroot/hostingstart.html
 
 RUN \
    mkdir -p /home/LogFiles \
-   && rm -rf /var/log/apache2 \
-   && ln -s /home/LogFiles /var/log/apache2 \
    && rm -rf /var/www/html \
    && ln -s /home/site/wwwroot /var/www/html \
    && chmod 755 /bin/init_container.sh
@@ -78,9 +74,6 @@ RUN { \
 COPY sshd_config /etc/ssh/
 
 EXPOSE 2222 8080
-
-ENV APACHE_RUN_USER www-data
-ENV PHP_VERSION 7.0.6
 
 ENV PORT 8080
 ENV WEBSITE_ROLE_INSTANCE_ID localRoleInstance
