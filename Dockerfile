@@ -96,16 +96,12 @@ ENV PHP_VERSION 7.0.6
 ENV PORT 8080
 ENV WEBSITE_ROLE_INSTANCE_ID localRoleInstance
 ENV WEBSITE_INSTANCE_ID localInstance
-ENV PATH ${PATH}:/home/site/wwwroot
-ENV PATH ${PATH}:/usr/local/php/bin/
 
 #Composer
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /home/.composer
 ENV COMPOSER_VERSION "1.4.2"
 ENV COMPOSER_SETUP_SHA 669656bab3166a7aff8a7506b8cb2d1c292f042046c5a994c43155c0be6190fa0355160742ab2e1c88d40d5be660b410
-
-RUN mkdir -p /usr/local/bin/composer
 
 # Install Composer
 RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setup.php \
@@ -118,7 +114,11 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
 #Drush
 #Create docroot and install drush 
 RUN mkdir -p /home/site/wwwroot/docroot 
-RUN php -r "readfile('http://files.drush.org/drush.phar');" > /home/site/wwwroot/docroot/drush 
+RUN php -r "readfile('http://files.drush.org/drush.phar');" > drush \
+    && chmod +x drush \
+    && mv drush /usr/local/bin
+
+ENV PATH /usr/local/bin:/home/site/wwwroot:/usr/local/php/bin:/composer/vendor/bin:$PATH
 
 WORKDIR /var/www/html
 
