@@ -126,6 +126,6 @@ ENV PATH ${PATH}:/home/site/wwwroot/docroot
 
 WORKDIR /var/www/html
 
-RUN drush @none dl registry_rebuild-7.x
+RUN php drush @none dl registry_rebuild-7.x
 
 ENTRYPOINT ["/bin/init_container.sh"]
