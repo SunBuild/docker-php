@@ -118,8 +118,9 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
 RUN php -r "readfile('http://files.drush.org/drush.phar');" > drush \
     && mv drush /usr/local/bin
 
-RUN php drush --version  
-RUN php composer 
+RUN echo $PATH
+#RUN php drush --version  
+#RUN php composer 
 
 WORKDIR /var/www/html
 
