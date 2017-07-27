@@ -1,10 +1,6 @@
 FROM php:7.0.6-apache
 MAINTAINER Azure App Services Container Images <appsvc-images@microsoft.com>
 
-COPY apache2.conf /bin/
-COPY init_container.sh /bin/
-COPY hostingstart.html /home/site/wwwroot/hostingstart.html
-
 RUN a2enmod rewrite expires include
 
 # install the PHP extensions we need
@@ -22,7 +18,6 @@ RUN apt-get update \
          openssh-server \
          mysql-client \
          git \
-    && chmod 755 /bin/init_container.sh \
     && echo "root:Docker!" | chpasswd \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
@@ -48,26 +43,20 @@ RUN apt-get update \
          mbstring \
          pcntl \
          ftp \
-    && docker-php-ext-enable imagick
+    && docker-php-ext-enable imagick redis
 
 
+COPY apache2.conf /etc/apache2/
+COPY init_container.sh /bin/
+COPY hostingstart.html /home/site/wwwroot/hostingstart.html
 
-RUN   \
-   rm -f /var/log/apache2/* \
-   && rmdir /var/lock/apache2 \
-   && rmdir /var/run/apache2 \
-   && rmdir /var/log/apache2 \
-   && chmod 777 /var/log \
-   && chmod 777 /var/run \
-   && chmod 777 /var/lock \
-   && chmod 777 /bin/init_container.sh \
-   && cp /bin/apache2.conf /etc/apache2/apache2.conf \
-   && rm -rf /var/www/html \
+RUN \
+   mkdir -p /home/LogFiles \
    && rm -rf /var/log/apache2 \
-   && mkdir -p /home/LogFiles \
+   && ln -s /home/LogFiles /var/log/apache2 \
+   && rm -rf /var/www/html \
    && ln -s /home/site/wwwroot /var/www/html \
-   && ln -s /home/LogFiles /var/log/apache2
-
+   && chmod 755 /bin/init_container.sh
 
 RUN { \
                 echo 'opcache.memory_consumption=128'; \
@@ -115,9 +104,7 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
 #Drush
 RUN php -r "readfile('http://files.drush.org/drush.phar');" > /usr/local/bin/drush \
     && chmod +x /usr/local/bin/drush
-RUN drush @none dl registry_rebuild-7.x
 
-RUN mkdir -p /home/site/wwwroot/docroot
 WORKDIR /var/www/html
 
 ENTRYPOINT ["/bin/init_container.sh"]
