@@ -116,7 +116,6 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
     && rm /tmp/composer-setup.php \
     && ln -sf /composer/bin/composer /usr/local/bin/composer
 
-
 #Drush
 #Create docroot and install drush 
 RUN mkdir -p /home/site/wwwroot/docroot 
@@ -124,8 +123,10 @@ RUN php -r "readfile('http://files.drush.org/drush.phar');" > /home/site/wwwroot
 
 ENV PATH ${PATH}:/home/site/wwwroot/docroot
 
+echo $PATH
+
 WORKDIR /var/www/html
 
-RUN php drush @none dl registry_rebuild-7.x
+#RUN php drush @none dl registry_rebuild-7.x
 
 ENTRYPOINT ["/bin/init_container.sh"]
