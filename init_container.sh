@@ -3,9 +3,30 @@ service ssh start
 sed -i "s/error.log/error_$WEBSITE_ROLE_INSTANCE_ID.log/g" /etc/apache2/apache2.conf 
 sed -i "s/access.log/access_$WEBSITE_ROLE_INSTANCE_ID.log/g" /etc/apache2/apache2.conf
 sed -i "s/{PORT}/$PORT/g" /etc/apache2/apache2.conf
-mkdir /var/lock/apache2
-mkdir /var/run/apache2
-mkdir /var/log/apache2
+
+if [ ! -d "/var/lock/apache2" ]; then
+  mkdir -p /var/lock/apache2
+fi
+
+if [ ! -d "var/log/apache2" ]; then
+  mkdir -p /var/log/apache2
+fi
+if [ ! -d "/var/run/apache2" ]; then
+  mkdir -p /var/run/apache2
+fi
+
+
 touch /var/log/apache2/access_$WEBSITE_ROLE_INSTANCE_ID.log
+
 echo "$(date) Container started" >> /var/log/apache2/access_$WEBSITE_ROLE_INSTANCE_ID.log
+
 /usr/sbin/apache2ctl -D FOREGROUND
+
+echo "Path configured..."
+
+echo $PATH 
+
+if [ ! -d "/home/site/wwwroot/docroot/drush" ]; then
+  echo "running drush registry build ....."
+  php drush @none dl registry_rebuild-7.x
+fi
