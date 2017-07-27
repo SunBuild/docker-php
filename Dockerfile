@@ -104,7 +104,6 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
 #Drush
 RUN php -r "readfile('http://files.drush.org/drush.phar');" > /usr/local/bin/drush \
     && chmod +x /usr/local/bin/drush
-#RUN drush @none dl registry_rebuild-7.x
 
 WORKDIR /var/www/html
 
