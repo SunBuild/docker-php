@@ -36,7 +36,9 @@ echo "$(date) Container started" >> /var/log/apache2/access_$WEBSITE_ROLE_INSTAN
 
 echo "Path configured..."
 
-echo $PATH 
+#Adding Path 
+PATH=$PATH:/home/site/wwwroot/docroot:/usr/local/bin/composer
+export PATH
 
 if [ ! -d "/home/site/wwwroot/docroot/drush" ]; then
   echo "running drush registry build ....."

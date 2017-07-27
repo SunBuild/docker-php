@@ -120,8 +120,6 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
 RUN mkdir -p /home/site/wwwroot/docroot 
 RUN php -r "readfile('http://files.drush.org/drush.phar');" > /home/site/wwwroot/docroot/drush 
 
-ENV PATH ${PATH}:/home/site/wwwroot/docroot:/usr/local/bin/composer
-
 WORKDIR /var/www/html
 
 ENTRYPOINT ["/bin/init_container.sh"]
