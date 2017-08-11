@@ -13,6 +13,9 @@ exec 2>&1
 
 set -x
 
+# set fastcgi_read_timeout to resolve 504 gateway time out
+sed -i '/include fastcgi_params;/a\fastcgi_read_timeout 300;' /etc/nginx/sites-enabled/default.conf
+
 if [ ! -d "/home/site/wwwroot/docroot" ]; then
   mkdir -p /home/site/wwwroot/docroot
 fi
