@@ -42,8 +42,7 @@ RUN apk upgrade --update && \
          mbstring \
          pcntl \
          ftp \
-    && docker-php-ext-enable imagick redis
-
+    && docker-php-ext-enable imagick redis 
 
 COPY init_container.sh /bin/
 COPY hostingstart.html /home/site/wwwroot/hostingstart.html
@@ -97,6 +96,10 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
 #Drush
 RUN php -r "readfile('http://files.drush.org/drush.phar');" > /usr/local/bin/drush \
     && chmod +x /usr/local/bin/drush
+
+#APCU
+RUN pecl install apcu \
+    && echo "extension=apcu.so" >> /usr/local/etc/php/conf.d/php.ini
 
 WORKDIR /var/www/html
 
