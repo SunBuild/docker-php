@@ -1,7 +1,7 @@
 FROM richarvey/nginx-php-fpm:1.2.2
 MAINTAINER Women's Tennis Association <admin@wtanetworks.com>
 
-# install the PHP extensions we need
+# Install the PHP extensions we need
 RUN apk upgrade --update && \
     apk add \
          autoconf \
@@ -45,7 +45,7 @@ RUN apk upgrade --update && \
     && docker-php-ext-enable imagick redis 
 
 COPY init_container.sh /bin/
-COPY hostingstart.html /home/site/wwwroot/hostingstart.html
+COPY hostingstart.html /home/site/wwwroot/index.html
 
 RUN \
    mkdir -p /home/LogFiles \
@@ -79,11 +79,13 @@ ENV WEBSITE_ROLE_INSTANCE_ID localRoleInstance
 ENV WEBSITE_INSTANCE_ID localInstance
 
 
-#Composer
+# Composer
+# Updation: https://getcomposer.org/download/
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /home/.composer
-ENV COMPOSER_VERSION "1.4.2"
-ENV COMPOSER_SETUP_SHA 669656bab3166a7aff8a7506b8cb2d1c292f042046c5a994c43155c0be6190fa0355160742ab2e1c88d40d5be660b410
+ENV COMPOSER_VERSION "1.5.2"
+# SHA384SUM https://composer.github.io/installer.sha384sum
+ENV COMPOSER_SETUP_SHA 544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061
 ENV PATH ${PATH}:/usr/local/php/bin
 
 # Install Composer
@@ -93,11 +95,11 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > /tmp/composer-setu
     && php /tmp/composer-setup.php --install-dir=/usr/local/bin/ --filename=composer --version=${COMPOSER_VERSION} \
     && rm /tmp/composer-setup.php
 
-#Drush
+# Drush
 RUN php -r "readfile('http://files.drush.org/drush.phar');" > /usr/local/bin/drush \
     && chmod +x /usr/local/bin/drush
 
-#APCU
+# APCU
 RUN pecl install apcu \
     && echo "extension=apcu.so" >> /usr/local/etc/php/conf.d/php.ini
 
